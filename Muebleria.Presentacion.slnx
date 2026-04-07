@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Muebleria.Datos/Muebleria.Datos.vbproj" Id="e3032c8b-d594-4dd9-a379-3f920de1ff5b" />
+  <Project Path="Muebleria.Entidades/Muebleria.Entidades.vbproj" Id="00dd4bb7-afaf-4e74-a1e4-0c053d4a0524" />
+  <Project Path="Muebleria.Negocio/Muebleria.Negocio.vbproj" Id="35b525bc-498f-44f6-a5f3-261f2ecb80d3" />
+  <Project Path="Muebleria.Presentacion/Muebleria.Presentacion.vbproj" Id="0960c55f-fc13-4efa-a0ed-86d82be69f4a" />
+</Solution>
