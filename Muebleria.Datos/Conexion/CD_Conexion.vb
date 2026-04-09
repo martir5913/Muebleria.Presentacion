@@ -8,6 +8,10 @@ Public Class CD_Conexion
         _connectionString = ConfigurationManager.ConnectionStrings("OracleDb").ConnectionString
     End Sub
 
+    Public Function ObtenerConexion() As OracleConnection
+        Return New OracleConnection(_connectionString)
+    End Function
+
     Public Function ProbarConexion() As Boolean
         Try
             Using conn As New OracleConnection(_connectionString)
