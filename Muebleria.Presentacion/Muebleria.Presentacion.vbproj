@@ -234,6 +234,7 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <Content Include="Plantia\PLANTIA.HTML" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -253,7 +254,9 @@
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <Content Include="sql\PKG_TIPOS_MUEBLE.sql" />
     <Content Include="Views\Clientes\Index.vbhtml" />
+    <Content Include="sql\scritpDB.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
