@@ -28,7 +28,7 @@ Namespace Controllers
 
                 If carrito IsNot Nothing Then
                     Session("CarritoId") = carrito.CarritoId
-                    Dim items = _carritoService.ObtenerItems(carrito.CarritoId)
+                    Dim items = _carritoService.ObtenerItems(clienteId, carrito.CarritoId)
                     ViewBag.Total = items.Sum(Function(i) i.Subtotal)
                     Return View(items)
                 End If
@@ -43,11 +43,13 @@ Namespace Controllers
 
         ' POST: Carrito/EliminarItem
         <HttpPost>
-        Function EliminarItem(itemId As Integer) As ActionResult
+        Function EliminarItem(productoId As Integer) As ActionResult
             If Not VerificarSesion() Then Return RedirectToAction("Login", "Cuenta")
 
             Try
-                _carritoService.EliminarItem(itemId)
+                Dim clienteId As Integer = Convert.ToInt32(Session("ClienteId"))
+                Dim carritoId As Integer = Convert.ToInt32(Session("CarritoId"))
+                _carritoService.EliminarItem(clienteId, carritoId, productoId)
                 TempData("Exito") = "Producto eliminado del carrito."
             Catch ex As Exception
                 TempData("Error") = "Error: " & ex.Message

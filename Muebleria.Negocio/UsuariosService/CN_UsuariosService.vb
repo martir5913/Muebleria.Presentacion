@@ -1,5 +1,3 @@
-﻿Imports System.Security.Cryptography
-Imports System.Text
 Imports Muebleria.Datos
 Imports Muebleria.Datos.Muebleria.Datos
 Imports Muebleria.Entidades
@@ -48,24 +46,12 @@ Public Class CN_UsuariosService
                 Throw New ArgumentException("El rol debe ser ADMIN o CLIENTE.")
             End If
 
-            Dim usuario As New CE_Usuario(0, username, HashSHA256(password), rol, clienteId)
+            Dim usuario As New CE_Usuario(0, username, password, rol, clienteId)
 
             Return _usuariosData.Insertar(usuario)
         Catch ex As Exception
             Throw New Exception("Error en negocio al registrar usuario: " & ex.Message, ex)
         End Try
-    End Function
-
-    ' ─── HASH SHA256 (privado) ───────────────────────────────────
-    Private Function HashSHA256(input As String) As String
-        Using sha256 As SHA256 = SHA256.Create()
-            Dim bytes As Byte() = sha256.ComputeHash(Encoding.UTF8.GetBytes(input))
-            Dim sb As New StringBuilder()
-            For Each b As Byte In bytes
-                sb.Append(b.ToString("x2"))
-            Next
-            Return sb.ToString()
-        End Using
     End Function
 
 End Class

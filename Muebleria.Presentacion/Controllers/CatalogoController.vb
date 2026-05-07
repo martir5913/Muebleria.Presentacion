@@ -33,13 +33,14 @@ Namespace Controllers
 
         ' POST: Catalogo/AgregarAlCarrito
         <HttpPost>
+        <ValidateAntiForgeryToken>
         Function AgregarAlCarrito(productoId As Integer, cantidad As Integer) As ActionResult
             If Not VerificarSesion() Then Return RedirectToAction("Login", "Cuenta")
 
             Try
                 Dim clienteId As Integer = Convert.ToInt32(Session("ClienteId"))
                 Dim carrito As CE_Carrito = _carritoService.ObtenerCarritoActivo(clienteId)
-                _carritoService.AgregarProducto(carrito.CarritoId, productoId, cantidad)
+                _carritoService.AgregarProducto(clienteId, carrito.CarritoId, productoId, cantidad)
 
                 TempData("Exito") = "Producto agregado al carrito."
                 Return RedirectToAction("Index")

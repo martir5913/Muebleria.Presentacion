@@ -33,7 +33,7 @@ End If
                     <td>Q @item.Subtotal.ToString("N2")</td>
                     <td>
                         @Using Html.BeginForm("EliminarItem", "Carrito", FormMethod.Post)
-                            @Html.Hidden("itemId", item.ItemId)
+                            @Html.Hidden("productoId", item.ProductoId)
                             @<button type="submit" class="btn btn-danger btn-sm"
                                      onclick="return confirm('¿Eliminar este producto?')">
                                 ✕
@@ -58,7 +58,7 @@ End If
                 <select name="formaPago" class="form-select">
                     <option value="TARJETA">Tarjeta de Crédito/Débito</option>
                     <option value="EFECTIVO">Efectivo</option>
-                    <option value="TRANSFERENCIA">Transferencia Bancaria</option>
+                    <option value="TRANSFER">Transferencia Bancaria</option>
                 </select>
             </div>
             @<button type="submit" class="btn btn-success w-100"
