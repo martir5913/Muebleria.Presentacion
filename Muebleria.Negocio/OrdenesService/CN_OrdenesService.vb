@@ -23,7 +23,7 @@ Public Class CN_OrdenesService
             End If
 
             ' Verificar que el carrito tenga items
-            Dim items As List(Of CE_CarritoItem) = _carritoData.ObtenerItems(carritoId)
+            Dim items As List(Of CE_CarritoItem) = _carritoData.ObtenerItems(clienteId, carritoId)
             If items Is Nothing OrElse items.Count = 0 Then
                 Throw New Exception("El carrito está vacío. Agregue productos antes de comprar.")
             End If

@@ -1,3 +1,4 @@
+Imports Muebleria.Entidades
 Imports Muebleria.Negocio
 
 Namespace Controllers
@@ -20,7 +21,7 @@ Namespace Controllers
                 Return View(clientes)
             Catch ex As Exception
                 ViewBag.Error = "Error al cargar clientes: " & ex.Message
-                Return View(New List(Of Object)())
+                Return View(New List(Of CE_Cliente)())
             End Try
         End Function
 

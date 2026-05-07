@@ -21,8 +21,9 @@ Public Class CN_CarritoService
         End Try
     End Function
 
-    Public Function AgregarProducto(carritoId As Integer, productoId As Integer, cantidad As Integer) As Boolean
+    Public Function AgregarProducto(clienteId As Integer, carritoId As Integer, productoId As Integer, cantidad As Integer) As Boolean
         Try
+            If clienteId <= 0 Then Throw New ArgumentException("El cliente no es válido.")
             If carritoId <= 0 Then Throw New ArgumentException("El carrito no es válido.")
             If productoId <= 0 Then Throw New ArgumentException("El producto no es válido.")
             If cantidad <= 0 Then Throw New ArgumentException("La cantidad debe ser mayor a cero.")
@@ -37,42 +38,46 @@ Public Class CN_CarritoService
                 .productoId = productoId,
                 .cantidad = cantidad
             }
-            Return _carritoData.AgregarItem(item)
+            Return _carritoData.AgregarItem(clienteId, item)
         Catch ex As Exception
             Throw New Exception("Error en negocio al agregar producto: " & ex.Message, ex)
         End Try
     End Function
 
-    Public Function EliminarItem(itemId As Integer) As Boolean
+    Public Function EliminarItem(clienteId As Integer, carritoId As Integer, productoId As Integer) As Boolean
         Try
-            If itemId <= 0 Then Throw New ArgumentException("El item no es válido.")
-            Return _carritoData.EliminarItem(itemId)
+            If clienteId <= 0 Then Throw New ArgumentException("El cliente no es válido.")
+            If carritoId <= 0 Then Throw New ArgumentException("El carrito no es válido.")
+            If productoId <= 0 Then Throw New ArgumentException("El producto no es válido.")
+            Return _carritoData.EliminarItem(clienteId, carritoId, productoId)
         Catch ex As Exception
             Throw New Exception("Error en negocio al eliminar item: " & ex.Message, ex)
         End Try
     End Function
 
-    Public Function ObtenerItems(carritoId As Integer) As List(Of CE_CarritoItem)
+    Public Function ObtenerItems(clienteId As Integer, carritoId As Integer) As List(Of CE_CarritoItem)
         Try
+            If clienteId <= 0 Then Throw New ArgumentException("El cliente no es válido.")
             If carritoId <= 0 Then Throw New ArgumentException("El carrito no es válido.")
-            Return _carritoData.ObtenerItems(carritoId)
+            Return _carritoData.ObtenerItems(clienteId, carritoId)
         Catch ex As Exception
             Throw New Exception("Error en negocio al obtener items: " & ex.Message, ex)
         End Try
     End Function
 
-    Public Function VaciarCarrito(carritoId As Integer) As Boolean
+    Public Function VaciarCarrito(clienteId As Integer, carritoId As Integer) As Boolean
         Try
+            If clienteId <= 0 Then Throw New ArgumentException("El cliente no es válido.")
             If carritoId <= 0 Then Throw New ArgumentException("El carrito no es válido.")
-            Return _carritoData.VaciarCarrito(carritoId)
+            Return _carritoData.VaciarCarrito(clienteId, carritoId)
         Catch ex As Exception
             Throw New Exception("Error en negocio al vaciar carrito: " & ex.Message, ex)
         End Try
     End Function
 
-    Public Function CalcularTotal(carritoId As Integer) As Decimal
+    Public Function CalcularTotal(clienteId As Integer, carritoId As Integer) As Decimal
         Try
-            Dim items = _carritoData.ObtenerItems(carritoId)
+            Dim items = _carritoData.ObtenerItems(clienteId, carritoId)
             Return items.Sum(Function(i) i.Subtotal)
         Catch ex As Exception
             Throw New Exception("Error en negocio al calcular total: " & ex.Message, ex)

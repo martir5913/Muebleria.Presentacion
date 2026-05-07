@@ -220,14 +220,16 @@ End Code
                     <div class="product-name">@producto.Nombre</div>
                     <div class="product-price">Q @String.Format("{0:N2}", producto.Precio) <span>GTQ</span></div>
                     @Using Html.BeginForm("AgregarAlCarrito", "Catalogo", FormMethod.Post)
+                        @Html.AntiForgeryToken()
                         @Html.Hidden("productoId", producto.ProductoId)
                         @Html.Hidden("cantidad", 1)
-                       @<button type="submit" class="btn-add">+ Agregar al carrito</button>
+                        @<button type="submit" class="btn-add">+ Agregar al carrito</button>
                     End Using
                 </div>
             </div>
         Next
     </div>
+Else
     @<div class="empty-state">
         <div class="empty-icon">🪑</div>
         <h3>No hay productos disponibles</h3>

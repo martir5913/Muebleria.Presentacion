@@ -1,5 +1,4 @@
-﻿Imports Muebleria.Entidades
-Imports Muebleria.Entidades.Muebleria.Entidades
+Imports Muebleria.Entidades
 Imports Muebleria.Negocio
 
 Namespace Controllers

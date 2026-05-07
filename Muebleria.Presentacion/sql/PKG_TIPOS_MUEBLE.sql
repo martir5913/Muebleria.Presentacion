@@ -16,15 +16,10 @@
 -- ================================================================================================
 
 -- ================================================================================================
--- 2. TRIGGER PARA ACTUALIZACIÓN AUTOMÁTICA DE TIMESTAMP
+-- 2. NOTA SOBRE TIMESTAMP
 -- ================================================================================================
-CREATE OR REPLACE TRIGGER TRG_TIPOS_MUEBLE_BU
-BEFORE UPDATE ON MDA_TIPOS_MUEBLE
-FOR EACH ROW
-BEGIN
-  :NEW.UPDATED_AT := SYSTIMESTAMP;
-END TRG_TIPOS_MUEBLE_BU;
-/
+-- MDA_TIPOS_MUEBLE no define columna UPDATED_AT en scritpDB.md.
+-- Por eso este paquete no crea trigger de auditoría sobre UPDATED_AT.
 
 -- ================================================================================================
 -- 3. ESPECIFICACIÓN DEL PAQUETE: PKG_TIPOS_MUEBLE
