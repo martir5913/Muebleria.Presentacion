@@ -1,4 +1,5 @@
 Imports Muebleria.Entidades
+Imports Muebleria.Entidades.Muebleria.Entidades
 Imports Muebleria.Negocio
 
 Namespace Controllers
@@ -58,7 +59,7 @@ Namespace Controllers
             Try
                 Dim producto = _productosService.ObtenerProductoPorId(id)
                 If producto Is Nothing Then Return HttpNotFound()
-                Return View(producto)
+                Return View("Crear", producto)
             Catch ex As Exception
                 TempData("Error") = "Error: " & ex.Message
                 Return RedirectToAction("Index")
@@ -76,7 +77,7 @@ Namespace Controllers
                 Return RedirectToAction("Index")
             Catch ex As Exception
                 ViewBag.Error = "Error: " & ex.Message
-                Return View(producto)
+                Return View("Crear", producto)
             End Try
         End Function
 
