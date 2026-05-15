@@ -30,7 +30,7 @@
 
         ' Datos extras para mostrar en reportes
         Public Property NombreProducto As String
-        Public Property ReferenciProducto As String
+        Public Property ReferenciaProducto As String
 
         Public Sub New()
         End Sub

@@ -19,16 +19,22 @@ Namespace Controllers
         End Function
 
         ' GET: Catalogo
-        Function Index() As ActionResult
+        Function Index(Optional cat As String = "") As ActionResult
             If Not VerificarSesion() Then Return RedirectToAction("Login", "Cuenta")
 
-            Try
-                Dim productos = _productosService.ObtenerTodosLosProductos()
-                Return View(productos)
-            Catch ex As Exception
-                ViewBag.Error = "Error al cargar productos: " & ex.Message
-                Return View(New List(Of CE_Producto)())
-            End Try
+            Dim productos As List(Of CE_Producto) = MockProductos.ObtenerTodos()
+
+            Dim cats = productos _
+                .Select(Function(p) p.TipoMuebleNombre) _
+                .Where(Function(n) Not String.IsNullOrEmpty(n)) _
+                .Distinct() _
+                .OrderBy(Function(n) n) _
+                .ToList()
+
+            ViewBag.Categorias = cats
+            ViewBag.CatActual = If(String.IsNullOrWhiteSpace(cat), "todos", cat.Trim().ToLower())
+
+            Return View(productos)
         End Function
 
         ' POST: Catalogo/AgregarAlCarrito

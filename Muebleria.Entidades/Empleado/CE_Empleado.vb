@@ -1,25 +1,27 @@
-﻿Namespace Muebleria.Entidades
+Namespace Muebleria.Entidades
 
     Public Class CE_Empleado
 
         Public Property EmpleadoId As Integer
-        Public Property Nombre As String
+        Public Property Nombres As String
+        Public Property Apellidos As String
+        Public Property Dpi As String
+        Public Property Telefono As String
+        Public Property Email As String
         Public Property Cargo As String
         Public Property Salario As Decimal
-        Public Property Activo As String
+        Public Property FechaContratacion As DateTime
+        Public Property Estado As String  ' A = Activo, I = Inactivo
 
         Public Sub New()
-            Activo = "S"
+            Estado = "A"
         End Sub
 
-        Public Sub New(id As Integer, nombre As String, cargo As String,
-                       salario As Decimal, activo As String)
-            EmpleadoId = id
-            Me.Nombre = nombre
-            Me.Cargo = cargo
-            Me.Salario = salario
-            Me.Activo = activo
-        End Sub
+        Public ReadOnly Property NombreCompleto As String
+            Get
+                Return (If(Nombres, "") & " " & If(Apellidos, "")).Trim()
+            End Get
+        End Property
 
     End Class
 
