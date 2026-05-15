@@ -1,6 +1,8 @@
-﻿Imports Muebleria.Entidades
+﻿Imports System.Data
+Imports Muebleria.Entidades
 Imports Muebleria.Entidades.Muebleria.Entidades
 Imports Oracle.ManagedDataAccess.Client
+Imports Oracle.ManagedDataAccess.Types ' Esencial para manejar OracleDecimal
 
 Namespace Muebleria.Datos
 
@@ -13,7 +15,7 @@ Namespace Muebleria.Datos
         End Sub
 
         ' =============================================
-        ' LOGIN - VALIDAR CREDENCIALES
+        ' LOGIN - VALIDAR CREDENCIALES (CORREGIDO PARA NULLS)
         ' =============================================
         Public Function Login(username As String, password As String) As CE_Usuario
             Dim usuario As CE_Usuario = Nothing
@@ -23,17 +25,37 @@ Namespace Muebleria.Datos
                     cmd.BindByName = True
                     cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = username
                     cmd.Parameters.Add("p_password", OracleDbType.Varchar2).Value = password
-                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Int32).Direction = ParameterDirection.Output
+
+                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Decimal).Direction = ParameterDirection.Output
                     cmd.Parameters.Add("o_rol", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output
-                    cmd.Parameters.Add("o_cliente_id", OracleDbType.Int32).Direction = ParameterDirection.Output
+                    cmd.Parameters.Add("o_cliente_id", OracleDbType.Decimal).Direction = ParameterDirection.Output
 
                     con.Open()
                     cmd.ExecuteNonQuery()
 
-                    Dim usuarioId As Integer = If(IsDBNull(cmd.Parameters("o_usuario_id").Value), 0, Convert.ToInt32(cmd.Parameters("o_usuario_id").Value))
+                    Dim usuarioId As Integer = 0
+
+                    ' Validación segura para o_usuario_id
+                    If Not IsDBNull(cmd.Parameters("o_usuario_id").Value) Then
+                        Dim oraUserDecimal As OracleDecimal = CType(cmd.Parameters("o_usuario_id").Value, OracleDecimal)
+                        ' Validamos que el objeto OracleDecimal interno no marque que es nulo
+                        If Not oraUserDecimal.IsNull Then
+                            usuarioId = oraUserDecimal.ToInt32()
+                        End If
+                    End If
+
                     If usuarioId > 0 Then
                         Dim rol As String = If(IsDBNull(cmd.Parameters("o_rol").Value), "", cmd.Parameters("o_rol").Value.ToString())
-                        Dim clienteId As Integer = If(IsDBNull(cmd.Parameters("o_cliente_id").Value), 0, Convert.ToInt32(cmd.Parameters("o_cliente_id").Value))
+                        Dim clienteId As Integer = 0
+
+                        ' === AQUÍ ESTABA EL PROBLEMA: Validación ultra segura para o_cliente_id ===
+                        If Not IsDBNull(cmd.Parameters("o_cliente_id").Value) Then
+                            Dim oraClientDecimal As OracleDecimal = CType(cmd.Parameters("o_cliente_id").Value, OracleDecimal)
+                            ' Si el OracleDecimal NO es nulo, extraemos su entero. Si es nulo (como en los ADMIN), se queda en 0
+                            If Not oraClientDecimal.IsNull Then
+                                clienteId = oraClientDecimal.ToInt32()
+                            End If
+                        End If
 
                         usuario = New CE_Usuario(
                             usuarioId,
@@ -57,16 +79,24 @@ Namespace Muebleria.Datos
                 Using cmd As New OracleCommand(commandText, con)
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.BindByName = True
+
                     If usuario.Rol = "CLIENTE" Then
-                        cmd.Parameters.Add("p_cliente_id", OracleDbType.Int32).Value = usuario.ClienteId
+                        cmd.Parameters.Add("p_cliente_id", OracleDbType.Decimal).Value = usuario.ClienteId
                     End If
+
                     cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = usuario.Username
                     cmd.Parameters.Add("p_password", OracleDbType.Varchar2).Value = usuario.PasswordHash
-                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Int32).Direction = ParameterDirection.Output
+                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Decimal).Direction = ParameterDirection.Output
 
                     con.Open()
                     cmd.ExecuteNonQuery()
-                    Return Not IsDBNull(cmd.Parameters("o_usuario_id").Value) AndAlso Convert.ToInt32(cmd.Parameters("o_usuario_id").Value) > 0
+
+                    If Not IsDBNull(cmd.Parameters("o_usuario_id").Value) Then
+                        Dim oraInsertDecimal As OracleDecimal = CType(cmd.Parameters("o_usuario_id").Value, OracleDecimal)
+                        Return oraInsertDecimal.ToInt32() > 0
+                    End If
+
+                    Return False
                 End Using
             End Using
         End Function
@@ -76,8 +106,10 @@ Namespace Muebleria.Datos
         ' =============================================
         Public Function ExisteUsername(username As String) As Boolean
             Using con As OracleConnection = _conexion.ObtenerConexion()
+                ' CORREGIDO: Se agregó la palabra clave "Using" que faltaba aquí
                 Using cmd As New OracleCommand("SELECT COUNT(1) FROM MDA_USUARIOS WHERE USERNAME = :p_username", con)
                     cmd.CommandType = CommandType.Text
+                    cmd.BindByName = True
                     cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = username
 
                     con.Open()
