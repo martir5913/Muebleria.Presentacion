@@ -224,6 +224,7 @@
     <Content Include="Content\bootstrap-grid.rtl.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\productos-admin.css" />
     <Content Include="Documentacion\Manual.md" />
     <Content Include="Documentacion\ScriptSQL.md" />
     <None Include="My Project\Application.myapp">
@@ -256,6 +257,7 @@
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <Content Include="Scripts\productos-admin.js" />
     <Content Include="sql\PKG_TIPOS_MUEBLE.sql" />
     <Content Include="Views\Clientes\Index.vbhtml" />
     <Content Include="sql\scritpDB.md" />

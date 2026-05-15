@@ -1,0 +1,7 @@
+/* Estilos mínimos para la vista de administración de productos */
+.table-responsive img.img-thumbnail{width:50px;height:50px;object-fit:cover}
+.modal-muebles{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+.modal-contenido{background:#fff;padding:18px;border-radius:8px;max-width:760px;width:100%}
+.formulario-grilla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grupo.col-full{grid-column:1/-1}
+.modal-pie{display:flex;justify-content:flex-end}
