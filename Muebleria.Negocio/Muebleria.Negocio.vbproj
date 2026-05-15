@@ -70,7 +70,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BodegasService\CN_BodegasService.vb" />
     <Compile Include="CarritoService\CN_CarritoService.vb" />
+    <Compile Include="ReportesService\CN_ReportesService.vb" />
     <Compile Include="Clientes\CN_ClientesService.vb" />
     <Compile Include="Conexion\CN_ConexionService.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

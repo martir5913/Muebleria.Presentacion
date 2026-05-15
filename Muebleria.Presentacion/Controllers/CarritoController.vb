@@ -80,6 +80,24 @@ Namespace Controllers
             End Try
         End Function
 
+        ' POST: Carrito/Vaciar
+        <HttpPost>
+        Function Vaciar() As ActionResult
+            If Not VerificarSesion() Then Return RedirectToAction("Login", "Cuenta")
+
+            Try
+                Dim clienteId As Integer = Convert.ToInt32(Session("ClienteId"))
+                Dim carritoId As Integer = Convert.ToInt32(Session("CarritoId"))
+                _carritoService.VaciarCarrito(clienteId, carritoId)
+                Session.Remove("CarritoId")
+                TempData("Exito") = "Carrito vaciado."
+            Catch ex As Exception
+                TempData("Error") = "Error al vaciar carrito: " & ex.Message
+            End Try
+
+            Return RedirectToAction("Index")
+        End Function
+
         ' GET: Carrito/Confirmacion
         Function Confirmacion() As ActionResult
             If Session("UltimaOrdenId") Is Nothing Then
