@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Muebleria.Presentacion/Web.config
+/Muebleria.Presentacion/Web.Debug.config
+/Muebleria.Presentacion/Web.Release.config

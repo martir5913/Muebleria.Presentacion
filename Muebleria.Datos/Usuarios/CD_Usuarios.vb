@@ -1,4 +1,4 @@
-﻿Imports Muebleria.Entidades
+Imports Muebleria.Entidades
 Imports Muebleria.Entidades.Muebleria.Entidades
 Imports Oracle.ManagedDataAccess.Client
 Imports System.Security.Cryptography
@@ -53,27 +53,28 @@ Namespace Muebleria.Datos
                     cmd.Parameters.Add("o_rol", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output
                     cmd.Parameters.Add("o_cliente_id", OracleDbType.Decimal).Direction = ParameterDirection.Output
 
-                    con.Open()
-                    cmd.ExecuteNonQuery()
+                    Try
+                        con.Open()
+                        cmd.ExecuteNonQuery()
 
-                    ' --- Lectura segura: pasamos por ToString() para evitar el error de IConvertible ---
-                    Dim vUsuarioId As Object = cmd.Parameters("o_usuario_id").Value
-                    Dim vRol As Object = cmd.Parameters("o_rol").Value
-                    Dim vClienteId As Object = cmd.Parameters("o_cliente_id").Value
+                        ' --- Lectura segura: pasamos por ToString() para evitar el error de IConvertible ---
+                        Dim vUsuarioId As Object = cmd.Parameters("o_usuario_id").Value
+                        Dim vRol As Object = cmd.Parameters("o_rol").Value
+                        Dim vClienteId As Object = cmd.Parameters("o_cliente_id").Value
 
-                    Dim usuarioId As Integer = ParseOracleInt(vUsuarioId)
-                    If usuarioId > 0 Then
-                        Dim rol As String = ParseOracleString(vRol)
-                        Dim clienteId As Integer = ParseOracleInt(vClienteId)
+                        Dim usuarioId As Integer = ParseOracleInt(vUsuarioId)
+                        If usuarioId > 0 Then
+                            Dim rol As String = ParseOracleString(vRol)
+                            Dim clienteId As Integer = ParseOracleInt(vClienteId)
 
-                        usuario = New CE_Usuario(
-                    usuarioId,
-                    username,
+                            usuario = New CE_Usuario(
+                                usuarioId,
+                                username,
                     "",
                     rol,
                     clienteId
                 )
-                    End If
+                        End If
                 End Using
             End Using
 
@@ -81,16 +82,16 @@ Namespace Muebleria.Datos
         End Function
 
         ' =============================================
-        ' HELPERS para convertir tipos Oracle managed a tipos .NET
-        ' (OracleDecimal, OracleString no implementan IConvertible)
+        ' REGISTRAR NUEVO USUARIO
         ' =============================================
-        Private Function ParseOracleInt(valor As Object) As Integer
-            If valor Is Nothing Then Return 0
-            Dim s As String = valor.ToString()
-            If String.IsNullOrEmpty(s) OrElse s.Equals("null", StringComparison.OrdinalIgnoreCase) Then Return 0
-            Dim n As Integer
-            If Integer.TryParse(s, n) Then Return n
-            Return 0
+        Public Function InsertarAdmin(username As String, password As String) As Integer
+            Using con As OracleConnection = _conexion.ObtenerConexion()
+                Dim commandText As String = If(usuario.Rol = "ADMIN", "PKG_SEGURIDAD.SP_CREAR_USUARIO_ADMIN", "PKG_SEGURIDAD.SP_CREAR_USUARIO_CLIENTE")
+                Using cmd As New OracleCommand(commandText, con)
+                    cmd.CommandType = CommandType.StoredProcedure
+                    cmd.BindByName = True
+                    If usuario.Rol = "CLIENTE" Then
+                        cmd.Parameters.Add("p_cliente_id", OracleDbType.Int32).Value = usuario.ClienteId
         End Function
 
         Private Function ParseOracleString(valor As Object) As String
@@ -114,16 +115,16 @@ Namespace Muebleria.Datos
                 Using cmd As New OracleCommand(commandText, con)
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.BindByName = True
-
-                    If usuario.Rol = "CLIENTE" Then
-                        cmd.Parameters.Add("p_cliente_id", OracleDbType.Int32).Value = usuario.ClienteId
+                    cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = usuario.Username
+                    cmd.Parameters.Add("p_password", OracleDbType.Varchar2).Value = usuario.PasswordHash
+                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Int32).Direction = ParameterDirection.Output
                     End If
 
                     cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = usuario.Username
                     ' Ojo: el SP espera p_password_hash (no p_password) y debe traer el SHA256
                     cmd.Parameters.Add("p_password_hash", OracleDbType.Varchar2).Value = HashSHA256(usuario.PasswordHash)
-                    cmd.Parameters.Add("o_usuario_id", OracleDbType.Int32).Direction = ParameterDirection.Output
-
+                    cmd.ExecuteNonQuery()
+                    Return Not IsDBNull(cmd.Parameters("o_usuario_id").Value) AndAlso Convert.ToInt32(cmd.Parameters("o_usuario_id").Value) > 0
                     con.Open()
                     cmd.ExecuteNonQuery()
                     Return Not IsDBNull(cmd.Parameters("o_usuario_id").Value) _
@@ -133,11 +134,12 @@ Namespace Muebleria.Datos
         End Function
 
         ' =============================================
-        ' VERIFICAR SI USERNAME YA EXISTE
         ' =============================================
         Public Function ExisteUsername(username As String) As Boolean
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("SELECT COUNT(1) FROM MDA_USUARIOS WHERE USERNAME = :p_username", con)
+                Using con As OracleConnection = _conexion.ObtenerConexion()
+                    Using cmd As New OracleCommand("SELECT COUNT(1) FROM MDA_USUARIOS WHERE USERNAME = :p_username", con)
+                    "SELECT COUNT(1) FROM MDA_USUARIOS WHERE USERNAME = :p_username", con)
                     cmd.CommandType = CommandType.Text
                     cmd.Parameters.Add("p_username", OracleDbType.Varchar2).Value = username
                     con.Open()

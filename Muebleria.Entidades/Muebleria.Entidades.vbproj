@@ -92,6 +92,9 @@
     <Compile Include="Orden\CE_Orden.vb" />
     <Compile Include="Pago\CE_Pago.vb" />
     <Compile Include="Producto\CE_Producto.vb" />
+    <Compile Include="Bodega\CE_Bodega.vb" />
+    <Compile Include="Reporte\CE_Reporte.vb" />
+    <Compile Include="Sugerencia\CE_Sugerencia.vb" />
     <Compile Include="Usuario\CE_Usuario.vb" />
   </ItemGroup>
   <ItemGroup>

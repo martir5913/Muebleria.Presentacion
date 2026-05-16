@@ -1,4 +1,4 @@
-﻿Imports Muebleria.Entidades
+Imports Muebleria.Entidades
 Imports Muebleria.Entidades.Muebleria.Entidades
 Imports Muebleria.Negocio
 
@@ -26,20 +26,23 @@ Namespace Controllers
         Function Login(username As String, password As String) As ActionResult
             Try
                 Dim usuario As CE_Usuario = _usuariosService.Login(username, password)
+
+                If usuario Is Nothing Then
+                    ViewBag.Error = "Usuario o contraseña incorrectos."
+                    Return View()
+                End If
+
                 Session("Usuario") = usuario
                 Session("UsuarioId") = usuario.UsuarioId
                 Session("Rol") = usuario.Rol
                 Session("ClienteId") = usuario.ClienteId
                 Session("Username") = usuario.Username
+                Session("UsuarioNombre") = usuario.Username
 
-                If usuario.Rol = "ADMIN" Then
-                    Return RedirectToAction("Index", "Productos")
-                Else
-                    Return RedirectToAction("Index", "Catalogo")
-                End If
+                Return RedirectToAction("Index", "Catalogo")
 
             Catch ex As Exception
-                ViewBag.Error = ex.Message
+                ViewBag.Error = "Error al iniciar sesión: " & ex.Message
                 Return View()
             End Try
         End Function
@@ -53,22 +56,25 @@ Namespace Controllers
         ' POST: Cuenta/Registro
         <HttpPost>
         Function Registro(nombres As String, apellidos As String, email As String,
-                          direccion As String, username As String, password As String) As ActionResult
+                          direccion As String, numDocumento As String, telResidencia As String,
+                          username As String, password As String) As ActionResult
             Try
                 Dim clientesService As New CN_ClientesService()
 
-                ' 1. Crear cliente
                 Dim cliente As New CE_Cliente With {
-                    .Nombre = nombres & " " & apellidos,
-                    .Correo = email
+                    .Nombres = nombres,
+                    .Apellidos = apellidos,
+                    .Correo = email,
+                    .Direccion = If(direccion, ""),
+                    .NumDocumento = numDocumento,
+                    .TelResidencia = telResidencia,
+                    .TipoPersona = "N",
+                    .TipoDocId = 1,
+                    .CiudadId = 1
                 }
-                clientesService.InsertarCliente(cliente)
+                Dim nuevoClienteId As Integer = clientesService.RegistrarCliente(cliente)
 
-                ' 2. Obtener el cliente recién creado
-                Dim clienteGuardado = clientesService.ObtenerClientePorEmail(email)
-
-                ' 3. Crear usuario vinculado
-                _usuariosService.RegistrarUsuario(username, password, "CLIENTE", clienteGuardado.Id)
+                _usuariosService.RegistrarUsuario(username, password, "CLIENTE", nuevoClienteId)
 
                 TempData("Exito") = "Cuenta creada. Ya puedes iniciar sesión."
                 Return RedirectToAction("Login")

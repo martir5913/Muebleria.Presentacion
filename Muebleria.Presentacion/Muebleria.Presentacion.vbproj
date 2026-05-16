@@ -156,11 +156,14 @@
     <Compile Include="App_Start\BundleConfig.vb" />
     <Compile Include="App_Start\FilterConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
+    <Compile Include="Controllers\BodegasController.vb" />
     <Compile Include="Controllers\CarritoController.vb" />
     <Compile Include="Controllers\CatalogoController.vb" />
+    <Compile Include="Controllers\OfertasController.vb" />
     <Compile Include="Controllers\ClientesController.vb" />
     <Compile Include="Controllers\CuentaController.vb" />
     <Compile Include="Controllers\ProductosController.vb" />
+    <Compile Include="Controllers\ReportesController.vb" />
     <Compile Include="Controllers\TestDBController.vb" />
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
@@ -182,6 +185,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Controllers\HomeController.vb" />
+    <Compile Include="Helpers\MockProductos.vb" />
+    <Compile Include="Helpers\CategoryIcons.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -236,7 +241,6 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="packages.config" />
-    <Content Include="Plantia\PLANTIA.HTML" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -256,16 +260,17 @@
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <Content Include="Scripts\mla-store.js" />
     <Content Include="sql\PKG_TIPOS_MUEBLE.sql" />
-    <Content Include="Views\Clientes\Index.vbhtml" />
     <Content Include="sql\scritpDB.md" />
     <Content Include="Views\Cuenta\Login.vbhtml" />
     <Content Include="Views\Cuenta\Registro.vbhtml" />
-    <Content Include="Views\Catalogo\Index.vbhtml" />
-    <Content Include="Views\Carrito\Index.vbhtml" />
-    <Content Include="Views\Carrito\Confirmacion.vbhtml" />
-    <Content Include="Views\Productos\Index.vbhtml" />
-    <Content Include="Views\Productos\Crear.vbhtml" />
+    <Content Include="Views\Home_\Home index.VBHTML" />
+    <Content Include="Views\Carrito\Carrito index.VBHTML" />
+    <Content Include="Views\Catalogo\Catalogo index.VBHTML" />
+    <Content Include="Views\Ofertas\Index.vbhtml" />
+    <Content Include="Views\Clientes\Clientes index.VBHTML" />
+    <Content Include="Views\Productos\Productos index.VBHTML" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -285,9 +290,6 @@
     </Content>
     <Content Include="Content\Site.css" />
     <Content Include="Views\_ViewStart.vbhtml" />
-    <Content Include="Views\Home\About.vbhtml" />
-    <Content Include="Views\Home\Contact.vbhtml" />
-    <Content Include="Views\Home\Index.vbhtml" />
     <Content Include="Views\Shared\Error.vbhtml" />
     <Content Include="Views\Shared\_Layout.vbhtml" />
     <Content Include="Views\Web.config" />
@@ -295,6 +297,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Plantia\" />
     <Folder Include="Views\TestDB\" />
   </ItemGroup>
   <ItemGroup>

@@ -111,7 +111,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bodegas\CD_Bodegas.vb" />
     <Compile Include="Carrito\CD_Carrito.vb" />
+    <Compile Include="Reportes\CD_Reportes.vb" />
     <Compile Include="Clientes\CD_Clientes.vb" />
     <Compile Include="Conexion\CD_Conexion.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -131,6 +133,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Ordenes\CD_Ordenes.vb" />
+    <Compile Include="Sugerencias\CD_Sugerencias.vb" />
     <Compile Include="Productos\CD_Productos.vb" />
     <Compile Include="Usuarios\CD_Usuarios.vb" />
   </ItemGroup>

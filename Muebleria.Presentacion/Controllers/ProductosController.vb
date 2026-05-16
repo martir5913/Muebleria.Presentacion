@@ -19,14 +19,7 @@ Namespace Controllers
         ' GET: Productos
         Function Index() As ActionResult
             If Not VerificarAdmin() Then Return RedirectToAction("Login", "Cuenta")
-
-            Try
-                Dim productos = _productosService.ObtenerTodosLosProductos()
-                Return View(productos)
-            Catch ex As Exception
-                ViewBag.Error = "Error al cargar productos: " & ex.Message
-                Return View(New List(Of CE_Producto)())
-            End Try
+            Return View(MockProductos.ObtenerTodos())
         End Function
 
         ' GET: Productos/Crear
