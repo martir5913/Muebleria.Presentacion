@@ -26,7 +26,7 @@ Namespace Controllers
                 Return View(clientes)
             Catch ex As Exception
                 ViewBag.Error = "Error al cargar clientes: " & ex.Message
-                Return View(New List(Of CE_Cliente)())
+                Return View(New List(Of Entidades.Muebleria.Entidades.CE_Cliente)())
             End Try
         End Function
 

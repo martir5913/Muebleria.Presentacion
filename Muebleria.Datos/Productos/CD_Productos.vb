@@ -7,7 +7,6 @@ Namespace Muebleria.Datos
     Public Class CD_Productos
 
         Private _conexion As CD_Conexion
-
         Public Sub New()
             _conexion = New CD_Conexion()
         End Sub
@@ -18,20 +17,22 @@ Namespace Muebleria.Datos
         Public Function ObtenerTodos() As List(Of CE_Producto)
             Dim lista As New List(Of CE_Producto)
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_PRODUCTOS.SP_OBTENER_TODOS", con)
+                Using cmd As New OracleCommand("PKG_PRODUCTOS.OBTENER_PRODUCTOS", con)
                     cmd.CommandType = CommandType.StoredProcedure
-                    cmd.BindByName = True
-
-                    Dim pRc = cmd.Parameters.Add("o_rc", OracleDbType.RefCursor)
-                    pRc.Direction = ParameterDirection.Output
-
+                    cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output
                     con.Open()
                     cmd.ExecuteNonQuery()
 
                     Dim cursor = CType(pRc.Value, Oracle.ManagedDataAccess.Types.OracleRefCursor)
                     Using reader As OracleDataReader = cursor.GetDataReader()
                         While reader.Read()
-                            lista.Add(MapearProducto(reader))
+                            lista.Add(New CE_Producto(
+                                Convert.ToInt32(reader("PRODUCTO_ID")),
+                                reader("NOMBRE").ToString(),
+                                reader("REFERENCIA").ToString(),
+                                Convert.ToDecimal(reader("PRECIO_COP")),
+                                reader("ACTIVO").ToString()
+                            ))
                         End While
                     End Using
                 End Using
@@ -80,21 +81,24 @@ Namespace Muebleria.Datos
         Public Function ObtenerPorId(productoId As Integer) As CE_Producto
             Dim producto As CE_Producto = Nothing
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_PRODUCTOS.SP_OBTENER_PRODUCTO", con)
+                Using cmd As New OracleCommand("PKG_PRODUCTOS.OBTENER_PRODUCTO_POR_ID", con)
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.BindByName = True
                     cmd.Parameters.Add("p_producto_id", OracleDbType.Int32).Value = productoId
-
-                    Dim pRc = cmd.Parameters.Add("o_rc", OracleDbType.RefCursor)
-                    pRc.Direction = ParameterDirection.Output
-
+                    cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor).Direction = ParameterDirection.Output
                     con.Open()
                     cmd.ExecuteNonQuery()
 
                     Dim cursor = CType(pRc.Value, Oracle.ManagedDataAccess.Types.OracleRefCursor)
                     Using reader As OracleDataReader = cursor.GetDataReader()
                         If reader.Read() Then
-                            producto = MapearProducto(reader)
+                            producto = New CE_Producto(
+                                Convert.ToInt32(reader("PRODUCTO_ID")),
+                                reader("NOMBRE").ToString(),
+                                reader("REFERENCIA").ToString(),
+                                Convert.ToDecimal(reader("PRECIO_COP")),
+                                reader("ACTIVO").ToString()
+                            )
                         End If
                     End Using
                 End Using
@@ -107,27 +111,17 @@ Namespace Muebleria.Datos
         ' =============================================
         Public Function Insertar(p As CE_Producto) As Integer
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_PRODUCTOS.SP_CREAR_PRODUCTO", con)
+                Using cmd As New OracleCommand("PKG_PRODUCTOS.INSERTAR_PRODUCTO", con)
                     cmd.CommandType = CommandType.StoredProcedure
-                    cmd.BindByName = True
-                    cmd.Parameters.Add("p_referencia", OracleDbType.Varchar2).Value = p.Referencia
-                    cmd.Parameters.Add("p_nombre", OracleDbType.Varchar2).Value = p.Nombre
-                    cmd.Parameters.Add("p_descripcion", OracleDbType.Varchar2).Value = If(p.Descripcion, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_tipo_mueble_id", OracleDbType.Int32).Value = If(p.TipoMuebleId = 0, 1, p.TipoMuebleId)
-                    cmd.Parameters.Add("p_material", OracleDbType.Varchar2).Value = If(p.Material, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_alto_cm", OracleDbType.Decimal).Value = If(p.DimAltoCm = 0, 1D, p.DimAltoCm)
-                    cmd.Parameters.Add("p_ancho_cm", OracleDbType.Decimal).Value = If(p.DimAnchoCm = 0, 1D, p.DimAnchoCm)
-                    cmd.Parameters.Add("p_prof_cm", OracleDbType.Decimal).Value = If(p.DimProfCm = 0, 1D, p.DimProfCm)
-                    cmd.Parameters.Add("p_color", OracleDbType.Varchar2).Value = If(p.Color, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_peso_gramos", OracleDbType.Int32).Value = If(p.PesoGramos = 0, 1, p.PesoGramos)
-                    cmd.Parameters.Add("p_foto_url", OracleDbType.Varchar2).Value = If(p.FotoUrl, CObj(DBNull.Value))
-
-                    Dim pOut = cmd.Parameters.Add("o_producto_id", OracleDbType.Int32)
-                    pOut.Direction = ParameterDirection.Output
-
+                    cmd.Parameters.Add("p_nombre", OracleDbType.Varchar2).Value = producto.Nombre
+                    cmd.Parameters.Add("p_referencia", OracleDbType.Varchar2).Value = producto.Referencia
+                    cmd.Parameters.Add("p_tipo_mueble_id", OracleDbType.Int32).Value = 1
+                    cmd.Parameters.Add("p_precio_cop", OracleDbType.Decimal).Value = producto.Precio
+                    cmd.Parameters.Add("p_stock_inicial", OracleDbType.Int32).Value = 0
+                    cmd.Parameters.Add("o_producto_id", OracleDbType.Int32).Direction = ParameterDirection.Output
                     con.Open()
                     cmd.ExecuteNonQuery()
-                    Return Convert.ToInt32(pOut.Value.ToString())
+                    Return True
                 End Using
             End Using
         End Function
@@ -137,39 +131,15 @@ Namespace Muebleria.Datos
         ' =============================================
         Public Function Actualizar(p As CE_Producto) As Boolean
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_PRODUCTOS.SP_ACTUALIZAR_PRODUCTO", con)
+                Using cmd As New OracleCommand("PKG_PRODUCTOS.ACTUALIZAR_PRODUCTO", con)
                     cmd.CommandType = CommandType.StoredProcedure
-                    cmd.BindByName = True
-                    cmd.Parameters.Add("p_producto_id", OracleDbType.Int32).Value = p.ProductoId
-                    cmd.Parameters.Add("p_nombre", OracleDbType.Varchar2).Value = p.Nombre
-                    cmd.Parameters.Add("p_descripcion", OracleDbType.Varchar2).Value = If(p.Descripcion, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_tipo_mueble_id", OracleDbType.Int32).Value = If(p.TipoMuebleId = 0, 1, p.TipoMuebleId)
-                    cmd.Parameters.Add("p_material", OracleDbType.Varchar2).Value = If(p.Material, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_alto_cm", OracleDbType.Decimal).Value = If(p.DimAltoCm = 0, 1D, p.DimAltoCm)
-                    cmd.Parameters.Add("p_ancho_cm", OracleDbType.Decimal).Value = If(p.DimAnchoCm = 0, 1D, p.DimAnchoCm)
-                    cmd.Parameters.Add("p_prof_cm", OracleDbType.Decimal).Value = If(p.DimProfCm = 0, 1D, p.DimProfCm)
-                    cmd.Parameters.Add("p_color", OracleDbType.Varchar2).Value = If(p.Color, CObj(DBNull.Value))
-                    cmd.Parameters.Add("p_peso_gramos", OracleDbType.Int32).Value = If(p.PesoGramos = 0, 1, p.PesoGramos)
-                    cmd.Parameters.Add("p_foto_url", OracleDbType.Varchar2).Value = If(p.FotoUrl, CObj(DBNull.Value))
-
-                    con.Open()
-                    cmd.ExecuteNonQuery()
-                    Return True
-                End Using
-            End Using
-        End Function
-
-        ' =============================================
-        ' ACTUALIZAR PRECIO/STOCK — PKG_INVENTARIO
-        ' =============================================
-        Public Function ActualizarInventario(productoId As Integer, precio As Decimal, stock As Integer) As Boolean
-            Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_INVENTARIO.SP_ACTUALIZAR_PRECIO_STOCK", con)
-                    cmd.CommandType = CommandType.StoredProcedure
-                    cmd.BindByName = True
-                    cmd.Parameters.Add("p_producto_id", OracleDbType.Int32).Value = productoId
-                    cmd.Parameters.Add("p_precio_cop", OracleDbType.Decimal).Value = precio
-                    cmd.Parameters.Add("p_stock", OracleDbType.Int32).Value = stock
+                    cmd.Parameters.Add("p_producto_id", OracleDbType.Int32).Value = producto.ProductoId
+                    cmd.Parameters.Add("p_nombre", OracleDbType.Varchar2).Value = producto.Nombre
+                    cmd.Parameters.Add("p_referencia", OracleDbType.Varchar2).Value = producto.Referencia
+                    cmd.Parameters.Add("p_descripcion", OracleDbType.Varchar2).Value = ""
+                    cmd.Parameters.Add("p_material", OracleDbType.Varchar2).Value = ""
+                    cmd.Parameters.Add("p_color", OracleDbType.Varchar2).Value = ""
+                    cmd.Parameters.Add("p_precio_cop", OracleDbType.Decimal).Value = producto.Precio
                     con.Open()
                     cmd.ExecuteNonQuery()
                     Return True
@@ -182,33 +152,13 @@ Namespace Muebleria.Datos
         ' =============================================
         Public Function Eliminar(productoId As Integer) As Boolean
             Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand("PKG_PRODUCTOS.SP_ELIMINAR_PRODUCTO", con)
+                Using cmd As New OracleCommand("PKG_PRODUCTOS.ELIMINAR_PRODUCTO", con)
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.BindByName = True
                     cmd.Parameters.Add("p_producto_id", OracleDbType.Int32).Value = productoId
                     con.Open()
                     cmd.ExecuteNonQuery()
                     Return True
-                End Using
-            End Using
-        End Function
-
-        ' =============================================
-        ' OBTENER MAPA TIPO_MUEBLE_ID → NOMBRE
-        ' =============================================
-        Public Function ObtenerMapaTipos() As Dictionary(Of Integer, String)
-            Dim mapa As New Dictionary(Of Integer, String)()
-            Using con As OracleConnection = _conexion.ObtenerConexion()
-                Using cmd As New OracleCommand(
-                    "SELECT TIPO_MUEBLE_ID, NOMBRE FROM MDA_TIPOS_MUEBLE ORDER BY NOMBRE", con)
-                    cmd.CommandType = CommandType.Text
-                    con.Open()
-                    Using reader As OracleDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            Dim id As Integer = Convert.ToInt32(reader("TIPO_MUEBLE_ID").ToString())
-                            mapa(id) = reader("NOMBRE").ToString()
-                        End While
-                    End Using
                 End Using
             End Using
             Return mapa
